@@ -27,29 +27,41 @@ public class BalanceTransferController {
 	
 	@GetMapping("/balanceCheck/{acctId}")
 	private ResponseEntity<Object> balanceCheck(@PathVariable long acctId) {
-		log.info("BalanceCheck for account id :"+acctId);
-	   BankAccount account = balanceService.findByBankID(acctId);
-	   if(account != null)
-	   return ResponseEntity.ok().body(account);
-	   else
-		   return new ResponseEntity<Object>("Account not found for this id :"+acctId,HttpStatus.NOT_FOUND);  
+		try {
+			log.info("BalanceCheck for account id :"+acctId);
+		   BankAccount account = balanceService.findByBankID(acctId);
+		   if(account != null)
+		   return ResponseEntity.ok().body(account);
+		   else
+			   return new ResponseEntity<Object>("Account not found for this id :"+acctId,HttpStatus.NOT_FOUND);  
+		}catch(Exception Ex) {
+			return new ResponseEntity<Object>("Error :"+Ex,HttpStatus.FAILED_DEPENDENCY);
+		}
 	}
 	
 	@PostMapping("/createAccount/")
 	private ResponseEntity<Object> CreateAccount(@RequestBody BankAccount acct) {
-		log.info("Bank Account details :"+acct);
-		int value=  balanceService.createAccount(acct);
-		if(value != 0)
-		return new ResponseEntity<Object>(value,HttpStatus.CREATED);
-		else
-			return new ResponseEntity<Object>("Sorry! Account was not created please try again",HttpStatus.NOT_IMPLEMENTED);
+		try {
+			log.info("Bank Account details :"+acct);
+			int value=  balanceService.createAccount(acct);
+			if(value != 0)
+			return new ResponseEntity<Object>(value,HttpStatus.CREATED);
+			else
+				return new ResponseEntity<Object>("Sorry! Account was not created please try again",HttpStatus.NOT_IMPLEMENTED);
+		}catch(Exception Ex) {
+			return new ResponseEntity<Object>("Error :"+Ex,HttpStatus.FAILED_DEPENDENCY);
+		}
 			
 	}
 	
 	@PutMapping("/balanceTransfer/")
 	private  ResponseEntity<Object> BalanceTransfer(@RequestParam int senderAcct, @RequestParam int recieverAcct ,@RequestParam int transferAmount) {
-		log.info("BalanceTransfer Method SenderAccountNumber :"+senderAcct+", RecieverAccount"+recieverAcct+",transferable amount"+transferAmount);
-		String resultstr = balanceService.balanceTransfer(senderAcct,recieverAcct,transferAmount);
-		return new ResponseEntity<Object>(resultstr,HttpStatus.OK);
+		try {
+			log.info("BalanceTransfer Method SenderAccountNumber :"+senderAcct+", RecieverAccount"+recieverAcct+",transferable amount"+transferAmount);
+			String resultstr = balanceService.balanceTransfer(senderAcct,recieverAcct,transferAmount);
+			return new ResponseEntity<Object>(resultstr,HttpStatus.OK);
+		}catch(Exception Ex) {
+			return new ResponseEntity<Object>("Error :"+Ex,HttpStatus.FAILED_DEPENDENCY);
+		}
 	}	
 }
